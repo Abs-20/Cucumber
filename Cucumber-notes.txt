@@ -1,0 +1,217 @@
+Cucumber
+
+- BDD: BDD stands for Behavior Driven Development and which is actually inspired from TDD
+- TDD: Test Driven Development(Write the test first then the application until it pass the test
+
+
+# create project : 
+1- project ->mavenProject 
+2- maven-apache-quickStart 1.1
+3- add dependencies (junit,cucumber junit,cucumber-jave,cucumber-picocontainer,selenium-java)
+ and plugins
+
+
+# Cucumber Feature file:
+
+1- creat new folder (resources inside the test file )
+2- 2- file (Ebay_home).feature
+
+# Writing Gherkin Scenarios
+
+- Gherkin: Language used inside featur file 
+- feature file: In BDD, whatever behavior we describe for a particular application feature, we describe it through some Scenarios. 
+-5 key words: the words are case sensetive   
+		      1- Feature: what this whole file about(topic)
+			2- Scenario: the action (ex wehen we click on a button what will happen
+			3- Given what we have
+			4- when  the action 
+			5- Then the result
+
+# Creating Step Definitions:
+
+1- run the feature page and you will git the snippets 
+2- create package inside the java test a class call it (EbayHome_Steps)
+3- past the snippets to the class and delete the exception 
+
+
+# Junit Test Runner :
+
+1- create TestRunner package (inside java/test) then create a java class for the test 
+2- add the annotations: a- @RunWith(Cucumber.class)
+				b- @CucumberOptions( features={"//location of features "}, glue={"location of steps "}  )
+3- run as a Junit test 
+
+# Cucumber Options :
+
+1-features:features location
+2-glue:Steps location
+3-plugin: how the output will be formatted ,(3 types: 1- HTML ,2- JUnit, 3- Json)
+- plugin={"pretty", "html:report1"}    //ex for html we can use json or junit all small case letters.
+4-dryRun: - has two values true or false 
+	    - to check if there are any features scenario without assigned steps and it will creat the snippets. if false it will run everything .
+5- monochrome =true/false make the output display more clear 
+6- tags : we can tag multiple scenarios with one tag so we can run these scenarios together 
+ 		- the scenario can have multiple tags @.....
+7- name : it will run all the scenarios that contain this word 
+
+
+# Integration Selenium WebDriver
+
+1- we need to download selenium jar file  from the site (https://www.selenium.dev/downloads/) or simply add the dependency
+2- scroll down into the page and download the browser driver 
+
+
+
+# Global hooks:
+
+reduce the redundent code (the methods that used in more than one location )
+- we create new class for the common methods we will use 
+- we use the Hooks(annotations) @Before, @After
+- we use them inside the other classes by call it inside the constructors
+
+
+
+# Cucumber parameters
+
+- inside the Ghirkin file(feature) we put the string in the scenario between '' for int we dont
+- inside the steps inside the annotation we put the type string/int insid {} then we put the type inside the method and use it ex:    @Then("I search for {string} /{int }")
+- if we have different scenarios with parameter we dont need to creat new steps for it 
+- we can use more than one arguments 
+
+
+# Step Data Table:
+
+- when we have alot of values we need to pass
+- inside the Scenario part we declare the heads then the values between pipes ex:
+|element| exclude|Max|Min|
+|Iphone | promax |200|100|
+- we use it inside the steps def as follows:ex:
+public void ........ (DataTable dt){
+to access the element we use ................. dt.cell(1,0) -> the location in the array 
+
+
+# Scenario Outline [Data-Driven Testing]
+- it depends on how many rows in data table we have 
+- in feature page : we call it Scenario Outline
+-ex: ---------------------------------------------------------
+ Scenario Outline : Home page links 
+
+ Given I am on ebay home page 
+ when i click on '<link>'   -> more than one link 
+ Then I validate page navigate to '<url>' and title contain '<title>'
+
+Examples:
+|link   |......url|title      |
+|Motors |......url|eBay Motors|
+|Fashion|......url|Fashion    |
+----------------------------------------------------------------
+- then we generate the snippets and fill it as before 
+
+
+# Global Hooks:
+- if we have more than one global hooks it will run all of them before and after 
+
+
+# Cucumber Tags hooks :
+
+- if we want to run before and after for specific Scenario 
+- we creat a methode to do what we want in the common step file and add the specific hook we want ex:
+@Before("@SetCookies")
+  public void setCookies(){
+//code
+}
+
+- then we add that tag inside the feature page before the scenario 
+- it will run the global and the tag hooks together depends on the order of the methode in the class
+
+# Ordering hooks :
+- for the global hooks we use the word order ex: @Before(order=1)
+- for the tags hooks we do : @Before(value="@setCookies",order=0)  it will be run before the global even if it was second in the class order
+- we can put all the tagged hooks inside one class 
+
+
+# Tags in Cucumber
+
+-   and -> it will the group of Scenarios that have all the tags required ex: @p1 and @p2 and .....
+-   or -> Scenario with any of the tags ex:@p1 or @p2 or .....
+
+# Creating Page Factory [Web Element Repository] :
+
+- for specific page we create web elements (elements repository)
+- we take all the element inside the page and put it in the element repo ex we take the ebay Logo as a feiled as  follows:
+
+@FindBy(xpath="//...........") public WebElement ebayLogo;
+@FindBy(xpath="//...........") public WebElement searchString;
+- we declare a constructor as follows:
+
+public .....................(WebDriver driver){
+this.driver=driver;
+PageFactory.initElemints(driver,this)
+}
+
+
+
+#Creating Action Page:
+- we put all the actions like click , send keys .... for the whole page inside one Action page and move the actions from the steps into here
+
+ex:
+- fields
+private WebDriver driver;
+EbayHome_Elements  ebayHome_Elements ; // instance of ebay elements class 
+
+-constructor:
+public EbayHome_Action(CommonSteps commonSteps){
+this.driver=commonSteps.getDriver;
+ebayHome_Elements= new EbayHome_Elements(driver);
+}
+
+
+- methods 
+public void clickAdvancedLink(){
+ebayHome_Elements.advancedLink.click();
+}
+
+
+#creat common action class :
+
+- for the action that we use in more than one page .
+
+# we use the elements and the actions we declared in the step pages 
+
+
+# Masterthought: Reporting plugin:external report 
+
+- we add the dependency and the config file 
+- we add the plugin tag with the specific instruction for that report  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pom.xml   properties
+
+ <java.version>1.8</java.version>
+        <junit.version>4.12</junit.version>
+        <cucumber.version>1.2.5</cucumber.version>
+        <maven.compiler.version>3.3</maven.compiler.version>
+        <vertx.version>3.0.0</vertx.version>
+        <selenium.verstion>3.4.0</selenium.verstion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
